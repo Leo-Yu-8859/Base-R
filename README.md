@@ -1,2 +1,2 @@
-# Note-of-R
-Take notes of what I learned about R
+# Base R
+Basic R programming note
