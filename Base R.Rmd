@@ -1,0 +1,492 @@
+---
+title: "Take notes of basic R programming"
+author: "Leo-Yu-8859"
+date: "2020/7/20"
+output: html_document
+---
+
+## 關於 R 設定資料夾的函數
+
+#### 1. **getwd()** : 傳回目前 R 工作目錄的路徑
+
+wd is an abbreviation of working directory(工作目錄). 工作目錄是 R 存取資料的資料夾 
+
+```{r getwd}
+old.dir<-getwd()  # 把 getwd 傳回的字串指派給 old.dir
+```
+
+#### 2. **setwd("dir")** : 將 R 的工作目錄設定在 dir 資料夾 
+
+```{r setwd}
+setwd(old.dir)  # 此時 dir 資料夾為 old.dir 物件裡的東西，也就是原本的工作目錄
+```
+
+#### 3. **ls() / objects()** : 以字串向量的形式傳回所有在特定環境中的物件
+  
+```{r ls}
+ls()
+```
+
+#### 4. **list.files()** : 以字串向量的形式列出所有在工作目錄內的檔案
+```{r list.files}
+list.files()
+```
+
+#### 5. **dir.create()** : 在工作目錄內創造一個新的資料夾
+```{r dir.create}
+dir.create("testing")  # 在工作目錄內創造出一個名為 testing 的資料夾
+```
+
+#### 6. **args(name)** : 顯示出 name 函數的引數
+```{r args}
+args(ls)
+```
+
+#### 7. **file.create()** : 在工作目錄中創造新檔案
+```{r file.create}
+file.create("testing.txt")  # 在工作目錄中創造一個名為 testing.txt 的檔案，記得要打附檔名
+```
+
+#### 8. **file.exists()** : 確認檔案是否存在工作目錄內
+```{r file.exists}
+file.exists("testing.txt")  # 確認檔案 testing.txt 是否存在工作目錄內
+```
+
+#### 9. **file.rename()** : 變更檔案名稱
+```{r file.rename}
+file.rename("testing.txt", "testing2.txt")  # 把 testing.txt 的檔案名稱改為 testing2.txt
+```
+
+#### 10. **file.copy()** : 複製檔案並更改檔名
+```{r}
+file.copy("testing2.txt", "testing3.txt")  # 複製檔案 testing2.txt 並更改複製檔檔名為 testing3.txt
+```
+
+#### 11. **file.path()** : 創造路徑
+
+搭配 file.create 或 dir.create 使用可創造巢狀資料或資料夾
+
+```{r}
+file.create(file.path("testing", "testing4.R"))  # 在 testing 資料夾下創造出 testing4.R 檔案
+```
+
+#### 12. **file.remove()** : 刪除檔案
+
+file.remove可以放多個引數，如果想刪除的檔案在工作目錄的子資料夾內，要先利用 file.path 告訴 R 其子資料夾名稱才能正確將其刪除，且 file.remove 不能刪除資料夾
+
+```{r}
+file.remove("testing2.txt", "testing3.txt", file.path("testing","testing4.R"))
+```
+
+## 關於 vector 的函數
+
+vector 有兩種型態，第一種是向量元素的資料種類都相同（atomic vectors），例如向量內元素都是字串或都是數字，第二種是向量
+內元素資料種類不同（lists），也就是俗稱的串列
+
+資料種類：numeric、integer、complex、character、logical
+
+加雙引號（""）是告訴 R 被雙引號括住的是字串類型的資料
+
+logical vectors 包括 TRUE （代表1）、FALSE （代表0）
+
+NA（not available, missing data）
+
+NaN 代表 not a number
+
+Inf 代表 無限
+
+
+#### 1. **:** : 創造向量，且向量內每個元素相差1
+
+```{r}
+3.14:5  # 預期產生的向量是（3.14, 4.14）
+5:3.14  # 預期產生的向量是（5, 4）
+?`:`  #  查詢 operator (運算子)要加``
+```
+
+#### 2. **seq()** : 創造向量
+
+```{r}
+seq(1, 20)  # 結果等於1:20
+seq(1, 20, by=3)
+```
+
+#### 3. **rep()** : 創造有重複元素的向量
+```{r}
+rep(c(0, 1, 2), times=40)
+rep(c(0, 1, 2), each=10)
+```
+
+#### 4. **paste()** : 把 A、B、...向量的元素全部轉成字串再相黏 
+
+引數 sep 控制在向量 A、B、...相黏後，元素與元素之間的分隔
+引數 collapse 控制是否要把向量內的元素都黏起來，讓向量只有一個元素（有加 collapse 就代表 T），且它也處理原元素間該以甚麼分隔
+
+```{r}
+x<-c(1:5) ; y<-c("A", "B", "C", "D", "E")  # 兩向量的長度不一定要相同
+paste(LETTERS, 1:4, sep="-")  # LATTERS 是 R 預先設定的變數，裡面包含26個英文字母
+paste(x, y, sep="配")  
+paste(x, y, sep="配", collapse=" ")
+```
+
+#### 5. **sample()** : 從引數中隨機抽取樣本
+```{r}
+sample(rnorm(1000), size=100)
+sample(10)  # 隨機抽取的範圍是 1:10，且因為沒有提及 size，因此預設抽取的數量就是全抽
+```
+
+#### 6. **is.na()** : 以產生 TRUE、FALSE 的方式告訴我們一個向量內有哪些元素是NA
+```{r}
+is.na(c(NA,5, 4, NA))  #不等於以下寫法
+c(NA, 5, 4, NA)==NA  #因為 NA 並不是一個真正的值，它只是用來代替 missing data 的符號，因此邏輯判斷式不成立，而 R 只好傳回長度等同於此向量的 NA
+```
+
+#### 7. **sum()** : 傳回引數的加總，引數可以是 numeric、integer、complex、logical
+```{r}
+sum(c(TRUE,TRUE,TRUE,FALSE))
+```
+
+#### 8. **[]** : index vector 是用來挑出向量內某幾個元素，也就是選出向量的子集
+
+square brackets 內可以放四種不同類型的資料：邏輯向量、正整數向量、負整數向量、字串向量
+
+R 的指標是從1開始的，也就是向量內第一個元素的指標是1，而不是0
+
+```{r}
+x<-list("A"=1:7, "B"=TRUE)
+x[["B"]]  # 若要指定有 names 屬性的串列就要用兩個中括號
+x[2]  # 傳回的資料包含 name 屬性
+identical(x[["B"]], x[[2]])
+```
+
+
+#### 9. **!** : 代表邏輯表達式（logical expression）的相反，TRUE 變成 FALSE，FALSE 變成 TRUE
+
+```{r}
+a<-c(rnorm(20), rep(NA, times=14))
+b<-a[!is.na(a)]
+```
+
+
+
+#### 10. **==** : 檢驗兩個布林值或數字是否相同
+```{r}
+5==7
+```
+
+#### 11. **!=** : 檢驗兩個布林值或數字是否不同
+```{r}
+5!=7  # 或者你可以寫成以下的表達式
+!5==7
+```
+
+#### 12. **&/&&** : 兩個都是 TRUE 才會是 TRUE
+```{r}
+TRUE & c(TRUE, FALSE, FALSE)  # TRUE 會循環跟向量的元素進行配對，也就是 c(TRUE, TRUE, TRUE) & c(TRUE, FALSE, FALSE)
+TRUE && c(TRUE, FALSE, FALSE)  # 只會跟向量的第一個元素進行配對
+```
+
+#### 13. **|/||** : 只要有其中一個是 TRUE 就是 TRUE
+用法跟 &/&& 相同
+就像先加減後乘除，R 會先執行 &/&& 再執行|/||
+
+#### 14. **isTRUE()** : 判斷引數（邏輯表達式）是否為 TRUE
+```{r}
+isTRUE(4>1)
+```
+
+#### 15. **xor()** : 代表 exclusive or，只有在兩個引數符合（TRUE、FALSE）時才會判斷是TRUE
+```{r}
+xor(7!=4, TRUE && c(FALSE, TRUE))
+```
+
+#### 16. **which()** : 引數為邏輯向量，傳回向量內元素為 TRUE 的指標
+```{r}
+x<-sample(20)
+which(x>=17)  # 傳回向量 x 內大於等於 17 元素的指標
+```
+
+#### 17. **any()** : 引數為邏輯向量，如果向量內有多於一個元素為 TRUE 就傳回 TRUE
+```{r}
+any(c(TRUE, FALSE, FALSE))
+```
+
+#### 18. **all()** : 引數為邏輯向量，只有在向量內全部元素都是 TRUE 的狀況下才會傳回 TRUE
+```{r}
+all(c(TRUE, FALSE, FALSE))
+```
+
+
+#### 19. **names()** : 傳回或設定物件的 names
+```{r}
+a<-c(小王=5, 小陳=7, 小花=54)
+names(a)  # 傳回物件 a 的 names
+b<-c(5, 7, 54)
+names(b)<-c("小王", "小陳", "小花")  # 把屬性 names 指派給物件 b
+identical(a, b)
+a["小陳"]  # 傳回屬性 names 是小陳的元素，結果與 a[2] 相同
+```
+
+#### 20. **identical()** : 檢驗兩物件是否完全相同，傳回 TRUE 或 FALSE
+
+## 關於 matrices、data frame 的函數
+
+matrices 與 data frame 都是用來儲存表格式的資料（tabular data），而兩者間的不同在於 matrices 儲存的
+資料類別必須為同一種，data frame 則不限
+
+#### 1. **dim()** : 傳回或指派物件的維度
+
+這裡 dimension 的定義與線性代數中的定義不同
+```{r}
+x<-1:20
+dim(x)  # 因為 vector 不存在維度的屬性
+dim(x)<-c(4,5)  # 指派維度給 vector ，讓它變成 matrix
+```
+
+#### 2. **attributes()** : 傳回物件的屬性
+
+#### 3. **class()** : 傳回資料被儲存的型態
+
+class 代表資料儲存的型態，引數可以放 dataset 或 variable
+
+#### 4. **matrix()** : 創造出 matrix
+
+#### 5. **cbind()** : combine column
+
+#### 6. **data.frame()** : 創造出 data frame
+
+data.frame 也屬於 list，check with **is.list()**
+
+```{r}
+x<-c("A", "B", "C", "D")
+y<-matrix(1:20, nrow=4, ncol=5)
+cbind(x, y)  # 因為 x 是字串的資料類型，R 為了維持 matrix，只好強迫 y 也變成字串（implicit coercion），如果不想讓原本是數字的資料變成字串，就必須把 matrix 改成 data frame
+data.frame(x, y)
+```
+
+#### 7. **rownames()/colnames()** : 傳回或設定物件的 rownames、colnames屬性
+用法與 dim() 相同
+
+## 關於 function
+
+Inputs to functions are often called arguments（引數）which seems to be independent variables. 
+
+Providing arguments to a function is also called passing arguments to that function.
+
+anonymous function : The function that hasn't been defined.
+
+如果想知道 function 的原始碼，打 function name 就好，不須加引數跟括號
+
+通常來說，ellipses 會被放在最後一個引數（但並非絕對），但 R 規定所有被放在 ellipses 後的引數都必須加上預設值
+
+binary operator : `+`、`-`、`*`、`/`...，因為它的左右兩邊都要放東西
+
+```{r}
+quotient<-function(num, divisor=2){  # 預設 divisor 的值=2
+  num %/% divisor
+}
+
+args(quotient)  # 傳回 quotient() 的引數，值得注意的是 quotient 是一個函數，而在這個例子中可以發現函數可以成為其他函數的引數
+
+evaluate<-function(func, dat){  
+  func(dat)
+}
+
+evaluate(function(x){x+2}, 4)  # evaluate 函數中第一個引數就是 anonymous function
+
+telegram<-function(...){  # ...(ellipses) 可以放多個物件
+  paste("START", ..., "STOP")  
+}
+
+# Creating my own binary operator
+# 
+"%p%"<-function(left, right){
+  paste(left, right)
+}
+```
+
+## *apply family.
+
+*apply family 是用來執行 SAC strategy (Split-Apply-Combine)的函數。
+
+SAC strategy 是用來處理大數據的策略，當某一個類型原始資料的數量很多，有數萬、數十萬以上的資料筆數的時候，可以先將資料切割分塊 (split)，然後套用 (apply) 運算在分塊的數據資料上，最後再合併 (combine) 運算結果，將結果全部一次回傳給使用者。
+[SAC strategy](http://blog.maxkit.com.tw/2015/10/split-apply-combine-strategy-in-r-r.html)
+
+
+#### 1. **lapply()** : l 代表 list，第一個引數為 list（記得 data frame 也是 list），第二個引數是想要 apply 的 function name，且不須加 parentheses，傳回的資料型態也是 list
+
+```{r}
+lapply(iris, function(elem)elem[3])  # 自訂函數的寫法，而其中 elem 只是 dummy variable，因此可以用其他變數替代
+```
+
+
+#### 2. **sapply()** : 如同 lapply() 的功能，但會直接把原先 lapply() 傳回的 list 轉成 vector、matrix 或 array，簡化了有如 as.character() 的步驟。
+
+若 lapply() 傳回的 list 每個元素長度都是1，sapply() 會轉成vector ; 若 lapply() 傳回的 list 每個元素長度 > 1，且每個元素長度都相同，則 sapply() 會直接將結果轉成 matrix
+
+#### 3. **range()** : 以向量形式傳回引數的最大值與最小值
+
+#### 4. **unique()** : 把引數裡重複的元素去除，再傳回向量
+```{r}
+unique(c(3,3,5,5,5,7))
+```
+
+#### 5. **vapply()** : 跟 sapply() 很像，只是它能指定傳回資料的形式，如果 R 傳回的資料形式無法 fit 我們所指定的資料形式，則傳回 error
+
+好處是可以避免我們錯誤預期結果導致後面一連串的錯誤
+
+第三個引數為以下時：
+
+numeric(1) : 每將一個 column apply 到 function 時，指定傳回一個長度為 1 的 numeric vector
+character(1) : 每將一個 column apply 到 function 時，指定傳回一個長度為 1 的 character vector
+
+#### 6. **tapply()** : R 以 index 引數為標準區別 X 引數，也就是把 x 引數區分成幾個 group，再 apply Fun
+
+## 遇到新資料時可以用以下函數來了解它
+
+#### 1. **class()** :  先大致了解整個 dataset 是哪種結構
+
+#### 2. **head()/tail()** :  傳回引數最前面（後面）的部分，預設為資料的前（後）6列
+
+#### 3. **str() / summary()** : 顯示物件的結構
+
+summary() : 若 dataset 中的 variable 為 character 則傳回 length、class、mode，若 variable 是 factor 則傳回每個 level 值出現的數量，若 variable 為 numeric data 則傳回敘述統計（包括四分位數、Min、Max、NA數）
+
+str() : str is the abbreviation of structure，傳回整個 dataset 的 class，observation 數量、variable 數量、每個 variable 的 class 以及 dataset 的 preview
+
+#### 4. **table()** : 做出 contingency table
+
+#### 5. **nrow()/ncol()/dim()** : 了解資料的形狀
+
+#### 6. **object.size()** : 查詢物件用了多少記憶體
+
+#### 7. **data()** : load dataset
+```{r}
+data(iris)
+```
+
+
+## 利用分配產生隨機數字
+
+#### 1. **sample()** 
+
+replace 控制能否重複抽取
+
+如果不指定 size，default size = length(x)，也就是將 x 重新排列（permute、rearrange）
+```{r}
+sample(LETTERS)
+```
+
+#### 2. **rbinom()** : **r** 代表 random，**binom** 代表 binomial 分配
+
+#### 3. **rnorm()**
+
+#### 4. **rpois()** 
+
+#### 5. **rexp()**
+
+#### 6. **rchisq()**
+
+#### 7. **rgamma()**
+
+#### 8. **replicate()** : 可用來創造幾組隨機變數，而每組隨機變數下又有幾個隨機變數
+
+#### 9. **colMeans()** : 算每個 column 的平均
+
+## 日期與時間的表示法：在處理時間數列資料時會用到
+
+class = Dates 代表 Dates，class = POSIXct 或 POSIXlt 代表 Times
+
+Dates 是從 1970-01-01 作為起點開始被存為數字，Times 則是從 1970-01-01 作為起點開始以秒的形式存（POSIXct）或以 list of seconds, minutes, hours, etc 的形式存（POSIXlt）
+
+#### 1. **Sys.Date()** : 傳回目前的日期
+
+#### 2. **unclass()** : 複製物件並刪掉 class attribute 再傳回，可用來看 Dates、times 的 internal number，也就是他們的儲存方式
+```{r}
+unclass(as.Date("1970-01-01"))  # 預期 = 0，因為 1970-01-01 為基期
+```
+
+
+#### 3. **as.Date()** : 創造日期
+```{r}
+d1<-as.Date("1969-01-01")  # 注意此日期是在 1970-01-01 之前
+unclass(d1)  # 是負的
+```
+
+#### 4. **Sys.time()** : 傳回目前的日期與時間
+
+預設是以 POSIXct 的方式儲存
+
+#### 5. **as.POSIXlt()** : 強迫原本 class 是 POSIXct 的物件轉成 POSIXlt
+
+轉成 POSIXlt 的好處是可以用 list 指標的方式選取我們想要的東西
+
+#### 6. **weekdays()** : 傳回輸入的 Date 或 time 物件是禮拜幾
+
+#### 7. **months()** : 傳回輸入的 Date 或 time 物件是幾月
+
+#### 8. **quarters()** : 傳回輸入的 Date 或 time 物件是第幾季
+
+#### 9. **strptime()** : 因為通常在 dataset 裡的 Dates、Times 資料都會被放在一個 R 認不出來的形式，因此 strptime() 的功能就是把字串向量轉成 POSIXlt，與 as.POSIXlt() 的功能很像，只是不用把引數寫成固定形式（YYYY-MM-DD）
+
+記得 format 是寫 x 的形式，語法參照 document
+
+如果產生了 NA，就輸入以下指令：
+> Sys.getlocale()
+
+跑出 : [1] "LC_COLLATE=Chinese (Traditional)_Taiwan.950;LC_CTYPE=Chinese (Traditional)_Taiwan.950;LC_MONETARY=Chinese (Traditional)_Taiwan.950;LC_NUMERIC=C;LC_TIME=Chinese (Traditional)_Taiwan.950"
+
+> Sys.setlocale("LC_TIME", "C")
+
+#### 10. **+/ -/ >/ <** : 關於時間物件的 operator
+```{r}
+t<-as.Date("1999-05-09")
+Sys.Date()>t  # 檢視目前時間是否晚於 1999-05-09，傳回邏輯運算子
+```
+
+但若我們想了解究竟晚幾天，可以用 **-** 或 **difftime()**
+```{r}
+Sys.Date()-t
+```
+
+#### 11. **difftime()** : 求兩個時間點差多少
+
+time1-time2
+
+units 控制單位，可以是"天"、"小時"...
+
+##### 如果很常碰到 dates 或 times，可以考慮用 **lubridate** package by Hadley Wickham 
+
+## 關於畫圖的函數
+
+#### 1. **base::plot()** 
+
+plot means scatter plot
+
+若在用 plot() 時出現以下 error :
+Error in plot.new() : figure margins too large
+這是因為 plot 窗口太小，只要把 plot 窗口拉大即可
+
+main 是控制圖的 title，會出現在圖的上方 ; sub 是控制圖的 sub title，會出現在圖的下方
+
+plot document 只列出一小部分的引數，若想知道更多可參考 par
+
+xlim 控制 x 的範圍，points 控制點的形狀
+
+
+```{r}
+plot(iris)  # 畫出iris's data frame，R 會自動把第一個變數當 X，第二個變數當 Y
+plot(x=iris$Sepal.Length, y=iris$Sepal.Width)  # 別寫 plot(iris$Sepal.Length, iris$Sepal.Width)
+
+```
+
+#### 2. **boxplot()** 
+
+#### 3. **hist()**
+
+
+
+
+
+
+
